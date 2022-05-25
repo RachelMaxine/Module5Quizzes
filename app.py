@@ -5,6 +5,7 @@ from flask import session
 import database as db
 import authentication
 import logging
+import ordermanagement as om
 
 app = Flask(__name__)
 
@@ -123,3 +124,63 @@ def updatecartitem():
         session["cart"] = cart
 
         return redirect('/cart')
+
+@app.route('/checkout')
+def checkout():
+    # clear cart in session memory upon checkout
+    om.create_order_from_cart()
+    session.pop("cart",None)
+    return redirect('/ordercomplete')
+
+@app.route('/ordercomplete')
+def ordercomplete():
+    return render_template('ordercomplete.html')
+
+@app.route('/changepassword')
+def changepassword():
+    return render_template('changepassword.html')
+
+@app.route('/changepass', methods = ['GET', 'POST'])
+def changepass():
+    curr_password = request.form.get("curr_password")
+    new_password = request.form.get("new_password")
+    new_password2 = request.form.get("new_password2")
+    user = session["user"]
+    username = user["username"]
+    temp_user =  db.get_user(username)
+    password = temp_user["password"]
+
+    if(password == curr_password):
+        if(new_password == new_password2):
+            db.update_pass(username,new_password)
+            success = "Password changed successfully."
+            return render_template('changepassword.html',success=success)
+        else:
+            error2 = "New passwords don't match."
+            return render_template('changepassword.html',error2=error2)
+    else:
+        error1 = "Password is incorrect."
+        return render_template('changepassword.html',error1=error1)
+
+@app.route('/pastorders')
+def past_orders():
+    user = session["user"]
+    username = user["username"]
+    orders = db.get_past_orders(username)
+    order = dict()
+    if(session.get("order") is None):
+	    session["order"] = {}
+
+    for o in range(len(orders)):
+        temp_order = orders[o]
+        temp_details = temp_order["details"]
+
+        order1 = temp_details
+        order["qty"] = temp_details["qty"]
+        order["name"] = temp_details["name"]
+        order["subtotal"] = temp_details["subtotal"]
+
+        past_orders = session["order"]
+        past_orders[o] = order
+        session["order"] = past_orders
+    return render_template('pastorders.html',order1=order1)

@@ -17,6 +17,7 @@
         {% endfor %}
         <tr><td colspan=2><b>Total</b></td><td><b>{{ session["cart"].values()|sum(attribute="subtotal") }}</b></td></tr>
     </table>
+    <a href="checkout">Checkout</a>
     {% else %}
     <div>Your cart is empty</div>
     {% endif %}

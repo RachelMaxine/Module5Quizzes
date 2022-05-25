@@ -1,0 +1,23 @@
+{% include "header.html" %}
+  <div>{{order1}}</div>
+      <h1>Past orders</h1>
+      {% if session["order"] is defined %}
+      <table>
+          <tr><th>Name</th><th>Quantity</th><th>Subtotal</th></tr>
+          {% for order in session["order"].values() %}
+          <form action="/updatecartitem" method="POST">
+          <tr>
+              <td>{{ order["name"] }}</td>
+              <td>{{ order["qty"]}}</td>
+              <td>{{ order["subtotal"] }}</td>
+          </tr>
+          </form>
+          {% endfor %}
+          <tr><td colspan=2><b>Total</b></td><td><b>{{ session["order"].values()|sum(attribute="subtotal") }}</b></td></tr>
+      </table>
+      <a href="checkout">Checkout</a>
+      {% else %}
+      <div>No orders have been made yet.</div>
+      {% endif %}
+
+{% include "footer.html" %}

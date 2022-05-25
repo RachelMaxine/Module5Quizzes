@@ -13,8 +13,11 @@
        {% if session["user"] is defined %}
        Welcome, {{ session["user"]["first_name"] }}.
        <a href='/cart'>View Cart</a> |
-       <a href='/logout'>Logout</a>
+       <a href='/logout'>Logout</a> |
+       <a href='/changepassword'>Change Password</a> |
+       <a href='/pastorders'>Past Orders</a>
        {% else %}
        <a href='/login'>Login</a>
        {% endif %}
+
        <p/>
